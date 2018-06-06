@@ -2,7 +2,11 @@
 pin_d = 2;
 pin_h = 6;
 edge = 2;
-figurine_spacing = 85;
+figurine_spacing = 55;
+top_text_distance = 45;
+base_width = 190;
+base_height = 135;
+base_radius = 25;
 
 name = "Catapult";
 
@@ -34,36 +38,39 @@ RL_struct= 15;
 LL_armor = 18;
 LL_struct= 15;
 
-// Front armor figurine
-armor = [HD_armor, CT_armor, RT_armor, LT_armor, RA_armor, LA_armor, RL_armor, LL_armor];
-armor_cols = [3, 3, 2, 2, 1, 1, 2, 2];
-FrontFigurine(armor, armor_cols);
-// Rear armor figurine
-rear = [CT_rear, RT_rear, LT_rear];
-rear_cols = [3, 2, 2];
-translate([-figurine_spacing, 0, 0]) RearFigurine(rear, rear_cols);
-
-// Structure figurine
-struct = [HD_struct, CT_struct, RT_struct, LT_struct, RA_struct, LA_struct, RL_struct, LL_struct];
-struct_cols = [2, 3, 2, 2, 1, 1, 2, 2];
-translate([figurine_spacing, 0, 0]) FrontFigurine(struct, struct_cols);
-
-// Common base and text
-difference()
+union()
 {
-    translate([0, -15, 0]) minkowski()
+    // Front armor figurine
+    armor = [HD_armor, CT_armor, RT_armor, LT_armor, RA_armor, LA_armor, RL_armor, LL_armor];
+    armor_cols = [3, 3, 2, 2, 1, 1, 2, 2];
+    FrontFigurine(armor, armor_cols);
+    // Rear armor figurine
+    rear = [CT_rear, RT_rear, LT_rear];
+    rear_cols = [3, 2, 2];
+    translate([-figurine_spacing, 0, 0]) RearFigurine(rear, rear_cols);
+
+    // Structure figurine
+    struct = [HD_struct, CT_struct, RT_struct, LT_struct, RA_struct, LA_struct, RL_struct, LL_struct];
+    struct_cols = [2, 3, 2, 2, 1, 1, 2, 2];
+    translate([figurine_spacing, 0, 0]) FrontFigurine(struct, struct_cols);
+
+    // Common base and text
+    difference()
     {
-        cube([200, 130, 1.5], center=true);
-        cylinder(r=25, $fn=50);
-    }
-    
-    linear_extrude(height=3, center = false)
-    {
-        // Name, etc.
-        translate([-figurine_spacing, -70, 0]) text(name, halign="center", size=14, font="style:Bold");
-        translate([0, 55, 0]) text("Front armor", halign="center");
-        translate([-figurine_spacing, 55, 0]) text("Rear armor", halign="center");
-        translate([figurine_spacing, 55, 0]) text("Structure", halign="center");
+        translate([0, -8, 0]) minkowski()
+        {
+            cube([base_width-2*base_radius, base_height-2*base_radius, 0.5], center=true);
+            cylinder(r=25, $fn=50);
+        }
+        
+        linear_extrude(height=3, center = true)
+        {
+            // Name, etc.
+            translate([-figurine_spacing, -70, 0]) text(name, halign="center", size=10, font="style:Bold");
+            translate([0, top_text_distance, 0]) text("Front armor", halign="center", size=7);
+            translate([-figurine_spacing, top_text_distance, 0]) text("Rear armor", halign="center", size=7);
+            translate([figurine_spacing, top_text_distance, 0]) text("Structure", halign="center", size=7);
+        }
     }
 }
 
@@ -88,34 +95,34 @@ module FrontFigurine(values, columns)
     LL_cols = columns[7];
     
     // center torso (CT)
-    CT_dims = calculate_dims(CT, cols=CT_cols, spacing=8);
+    CT_dims = calculate_dims(CT, cols=CT_cols, spacing=5);
     CT_width = CT_dims[2];
     CT_depth = CT_dims[3];
     Bodypart(CT, CT_dims);
     
     // head (HD)
-    HD_dims = calculate_dims(HD, cols=HD_cols, spacing=5);
+    HD_dims = calculate_dims(HD, cols=HD_cols, spacing=4);
     HD_width = HD_dims[2];
     HD_depth = HD_dims[3];
     translate([0, CT_depth/2 + HD_depth/2, 0])
         Bodypart(HD, HD_dims);
     
     // right torso (RT)
-    RT_dims = calculate_dims(RT, cols=RT_cols, spacing=5);
+    RT_dims = calculate_dims(RT, cols=RT_cols, spacing=4);
     RT_width = RT_dims[2];
     RT_depth = RT_dims[3];
     translate([CT_width/2 + RT_width/2, 0, 0])
         Bodypart(RT, RT_dims);
         
     // left torso (LT)
-    LT_dims = calculate_dims(LT, cols=LT_cols, spacing=5);
+    LT_dims = calculate_dims(LT, cols=LT_cols, spacing=4);
     LT_width = LT_dims[2];
     LT_depth = LT_dims[3];
     translate([-CT_width/2 - LT_width/2, 0, 0])
         Bodypart(LT, LT_dims);
     
     // right arm (RA)
-    RA_dims = calculate_dims(RA, cols=RA_cols, spacing=5);
+    RA_dims = calculate_dims(RA, cols=RA_cols, spacing=4);
     RA_width = RA_dims[2];
     RA_depth = RA_dims[3];
     RA_height = RA_dims[4];
@@ -125,7 +132,7 @@ module FrontFigurine(values, columns)
         Hand(RA_width, RA_height, true);
         
     // left arm (LA)
-    LA_dims = calculate_dims(LA, cols=LA_cols, spacing=5);
+    LA_dims = calculate_dims(LA, cols=LA_cols, spacing=4);
     LA_width = LA_dims[2];
     LA_depth = LA_dims[3];
     LA_height = LA_dims[4];
@@ -135,7 +142,7 @@ module FrontFigurine(values, columns)
         Hand(LA_width, LA_height, false);
     
     // right leg (RL)
-    RL_dims = calculate_dims(RL, cols=RL_cols, spacing=6);
+    RL_dims = calculate_dims(RL, cols=RL_cols, spacing=4.5);
     RL_width = RL_dims[2];
     RL_depth = RL_dims[3];
     RL_height = RL_dims[4];
@@ -145,7 +152,7 @@ module FrontFigurine(values, columns)
         Leg(RL_width, RL_height, true);
     
     // left leg (LL)
-    LL_dims = calculate_dims(LL, cols=LL_cols, spacing=6);
+    LL_dims = calculate_dims(LL, cols=LL_cols, spacing=4.5);
     LL_width = LL_dims[2];
     LL_depth = LL_dims[3];
     LL_height = LL_dims[4];
@@ -166,20 +173,20 @@ module RearFigurine(values, columns)
     LT_cols = columns[2];
     
     // center torso (CT)
-    CT_dims = calculate_dims(CT, cols=CT_cols, spacing=8);
+    CT_dims = calculate_dims(CT, cols=CT_cols, spacing=5);
     CT_width = CT_dims[2];
     CT_depth = CT_dims[3];
     Bodypart(CT, CT_dims);
     
     // right torso (RT)
-    RT_dims = calculate_dims(RT, cols=RT_cols, spacing=5);
+    RT_dims = calculate_dims(RT, cols=RT_cols, spacing=4);
     RT_width = RT_dims[2];
     RT_depth = RT_dims[3];
     translate([CT_width/2 + RT_width/2, 0, 0])
         Bodypart(RT, RT_dims);
         
     // left torso (LT)
-    LT_dims = calculate_dims(LT, cols=LT_cols, spacing=5);
+    LT_dims = calculate_dims(LT, cols=LT_cols, spacing=4);
     LT_width = LT_dims[2];
     LT_depth = LT_dims[3];
     translate([-CT_width/2 - LT_width/2, 0, 0])
@@ -218,7 +225,7 @@ module Bodypart(armor, dims)
         
         translate([armor_x_offset, armor_y_offset, -height])
             for (z_it = armor_idx)
-                translate(armor_pos[z_it]) cylinder(d = pin_d+0.5, h = 2*height);
+                translate(armor_pos[z_it]) cylinder(d = pin_d+0.2, h = 2*height);
     }
     
     function gen_pozice(n, cols, pos=idx2pos(1), cur_i=1) =
@@ -300,7 +307,7 @@ function calculate_dims(armor, cols, spacing) =
     cols,
     cols*spacing + edge,
     to_rows(armor, cols)*spacing + edge+1,
-    5,
+    4,
     spacing
 ];
 function to_rows(n, cols) = 
