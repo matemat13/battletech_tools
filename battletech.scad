@@ -49,7 +49,7 @@ struct_cols = [2, 3, 2, 2, 1, 1, 2, 2];
 translate([figurine_spacing, 0, 0]) FrontFigurine(struct, struct_cols);
 
 // Common base and text
-union()
+difference()
 {
     translate([0, -15, 0]) minkowski()
     {
@@ -218,7 +218,7 @@ module Bodypart(armor, dims)
         
         translate([armor_x_offset, armor_y_offset, -height])
             for (z_it = armor_idx)
-                translate(armor_pos[z_it]) %cylinder(d = pin_d+0.5, h = 2*height);
+                translate(armor_pos[z_it]) cylinder(d = pin_d+0.5, h = 2*height);
     }
     
     function gen_pozice(n, cols, pos=idx2pos(1), cur_i=1) =
